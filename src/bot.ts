@@ -74,12 +74,12 @@ const run = async (shouldDelay = false) => {
   const calcProfit = async (amountOut: EthersBN) => {
     const usdcOut = CurrencyAmount.fromRawAmount(usdc, amountOut.toString());
     const trade = await Trade.fromRoute(route, usdcOut, TradeType.EXACT_OUTPUT);
-    const requiredEthIn = EthersBN.from(usdcOut.quotient.toString())
+    const ethOfferedForOutputAmount = EthersBN.from(usdcOut.quotient.toString())
       .mul(BN_36)
       .div(price)
       .div(usdc.decimals);
 
-    return EthersBN.from(trade.inputAmount.quotient.toString()).sub(requiredEthIn);
+    return EthersBN.from(ethOfferedForOutputAmount).sub(trade.inputAmount.quotient.toString());
   };
 
   // Determine the most profitable output amount
