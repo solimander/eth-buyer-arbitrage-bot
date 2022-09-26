@@ -11,8 +11,8 @@ import {
   flashbots,
   signer,
   OPTIMAL_PRICE_ROUNDING_MARGIN,
-  OPPORTUNITY_CHECK_INTERVAL_SEC,
   UNISWAP_V3_SWAP_ROUTER_ADDRESS,
+  OPPORTUNITY_CHECK_INTERVAL_SEC as intervalSeconds,
 } from './config';
 import { CurrencyAmount, TradeType } from '@uniswap/sdk-core';
 import { TransactionRequest } from '@ethersproject/abstract-provider';
@@ -25,32 +25,31 @@ const { ArbitrageBot } = CONTRACT_ADDRESSES;
 
 /**
  * Run the arbitrage bot. This is a recursive function which delays itself if necessary.
+ * @param shouldDelay Whether execution should be delayed `intervalSeconds` seconds.
  */
-const run = async () => {
+const run = async (shouldDelay = false) => {
+  if (shouldDelay) {
+    await delay(intervalSeconds);
+  }
+
   const tokenBuyerState = await tryF<[EthersBN, EthersBN]>(async () =>
     tokenBuyer.tokenAmountNeededAndETHPayout(),
   );
   if (isError(tokenBuyerState)) {
-    logger.info('Price feed is stale. Skipping execution.');
-    return;
+    logger.info(`Price feed is stale. Retrying in ${intervalSeconds} seconds.`);
+    return run(true);
   }
 
   const [usdcNeeded, ethOffered] = tokenBuyerState;
   if (ethOffered.eq(0)) {
-    logger.info(
-      `Token buyer contract has no ETH balance. Checking again in ${OPPORTUNITY_CHECK_INTERVAL_SEC} seconds.`,
-    );
-    await delay(OPPORTUNITY_CHECK_INTERVAL_SEC);
-    run();
-    return;
+    logger.info(`Token buyer contract has no ETH balance. Retrying in ${intervalSeconds} seconds.`);
+    return run(true);
   }
   if (usdcNeeded.eq(0)) {
     logger.info(
-      `Token buyer contract does not need any USDC. Checking again in ${OPPORTUNITY_CHECK_INTERVAL_SEC} seconds.`,
+      `Token buyer contract does not need any USDC. Retrying in ${intervalSeconds} seconds.`,
     );
-    await delay(OPPORTUNITY_CHECK_INTERVAL_SEC);
-    run();
-    return;
+    return run(true);
   }
   logger.info(
     `Token buyer contract is offering ${utils.formatEther(ethOffered)} ETH for ${utils.formatUnits(
@@ -63,8 +62,8 @@ const run = async () => {
   const usdcOutputAmount = CurrencyAmount.fromRawAmount(usdc, usdcNeeded.toString());
   const swapRoute = await router.route(usdcOutputAmount, eth, TradeType.EXACT_OUTPUT, swapConfig);
   if (!swapRoute?.trade || !swapRoute?.route?.length) {
-    logger.info('Could not find a trade route. Skipping execution.');
-    return;
+    logger.info(`Could not find a trade route. Retrying in ${intervalSeconds} seconds.`);
+    return run(true);
   }
 
   // Populate the route with tick data, if necessary
@@ -109,13 +108,13 @@ const run = async () => {
     const required = utils.formatEther(ethRequiredForTrade);
     const gasCost = optimalPriceRoute?.estimatedGasUsedQuoteToken.toExact();
     logger.info(
-      `Arbitrage is not profitable. ETH offered by TokenBuyer: ${offered}. ETH required for trade: ${required}. Gas Cost: ${gasCost}. Skipping execution.`,
+      `Arbitrage is not profitable. ETH offered by TokenBuyer: ${offered}. ETH required for trade: ${required}. Gas Cost: ${gasCost}. Retrying in ${intervalSeconds} seconds.`,
     );
-    return;
+    return run(true);
   }
   if (!optimalPriceRoute?.methodParameters?.calldata) {
-    logger.info(`No Route Calldata. Skipping execution.`);
-    return;
+    logger.info(`No Route Calldata. Retrying in ${intervalSeconds} seconds.`);
+    return run(true);
   }
   logger.info(
     `Arbitrage is profitable. Expected Profit: ${utils.formatEther(
@@ -141,8 +140,10 @@ const run = async () => {
     ),
   );
   if (isError(gasEstimate)) {
-    logger.warn(`Arbitrage gas estimate failed with error: ${gasEstimate.message}`);
-    return;
+    logger.warn(
+      `Arbitrage gas estimate failed with error: ${gasEstimate.message}. Retrying in ${intervalSeconds} seconds.`,
+    );
+    return run(true);
   }
 
   const transaction: TransactionRequest = {
@@ -168,9 +169,9 @@ const run = async () => {
   );
   if (isError(result)) {
     logger.warn(
-      `Arbitrage failed with error: ${result.message}. Retrying in ${OPPORTUNITY_CHECK_INTERVAL_SEC} seconds.`,
+      `Arbitrage failed with error: ${result.message}. Retrying in ${intervalSeconds} seconds.`,
     );
-    await delay(OPPORTUNITY_CHECK_INTERVAL_SEC);
+    return run(true);
   }
   run();
 };
