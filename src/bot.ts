@@ -23,11 +23,13 @@ import { tryF, isError } from 'ts-try';
 
 const { ArbitrageBot } = CONTRACT_ADDRESSES;
 
+/**
+ * Run the arbitrage bot. This is a recursive function which delays itself if necessary.
+ */
 const run = async () => {
   const tokenBuyerState = await tryF<[EthersBN, EthersBN]>(async () =>
     tokenBuyer.tokenAmountNeededAndETHPayout(),
   );
-
   if (isError(tokenBuyerState)) {
     logger.info('Price feed is stale. Skipping execution.');
     return;
@@ -57,8 +59,6 @@ const run = async () => {
     )} USDC.`,
   );
 
-  const price = usdcNeeded.mul(BN_36).div(ethOffered).div(usdc.decimals);
-
   // Fetch swap route with best available price
   const usdcOutputAmount = CurrencyAmount.fromRawAmount(usdc, usdcNeeded.toString());
   const swapRoute = await router.route(usdcOutputAmount, eth, TradeType.EXACT_OUTPUT, swapConfig);
@@ -69,7 +69,9 @@ const run = async () => {
 
   // Populate the route with tick data, if necessary
   const route = await getPopulatedRoute(swapRoute.route[0].route);
+  const price = usdcNeeded.mul(BN_36).div(ethOffered).div(usdc.decimals);
 
+  // Calculate profit (without gas costs)
   const calcProfit = async (amountOut: EthersBN) => {
     const usdcOut = CurrencyAmount.fromRawAmount(usdc, amountOut.toString());
     const trade = await Trade.fromRoute(route, usdcOut, TradeType.EXACT_OUTPUT);
@@ -88,6 +90,7 @@ const run = async () => {
   }
   logger.info(`Optimal USDC output amount: ${utils.formatUnits(optimalUSDCOut, usdc.decimals)}`);
 
+  // Fetch a fresh route with the optimal USDC output
   const optimalPriceRoute = await router.route(
     CurrencyAmount.fromRawAmount(usdc, optimalUSDCOut.toString()),
     eth,
