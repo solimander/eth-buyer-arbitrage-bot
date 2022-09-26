@@ -1,0 +1,47 @@
+{
+  "name": "eth-buyer-arbitrage-bot",
+  "version": "0.1.0",
+  "description": "An example ETH buyer arbitrage bot",
+  "main": "index.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "format": "prettier --write \"src/**/*.ts\" \"contracts/**/*.sol\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/bot.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solimander/eth-buyer-arbitrage-bot.git"
+  },
+  "author": "solimander",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/solimander/eth-buyer-arbitrage-bot/issues"
+  },
+  "homepage": "https://github.com/solimander/eth-buyer-arbitrage-bot#readme",
+  "dependencies": {
+    "@flashbots/ethers-provider-bundle": "^0.5.0",
+    "@uniswap/sdk-core": "^3.0.2",
+    "@uniswap/smart-order-router": "^2.10.0",
+    "@uniswap/v3-periphery": "1.4.1",
+    "@uniswap/v3-sdk": "^3.9.0",
+    "async-retry": "^1.3.3",
+    "dotenv": "^16.0.2",
+    "ethers": "^5.7.1",
+    "graphql": "^16.6.0",
+    "graphql-request": "^5.0.0",
+    "ts-try": "^0.2.0",
+    "tslog": "^3.3.4"
+  },
+  "devDependencies": {
+    "@types/async-retry": "^1.4.5",
+    "@types/node": "^18.7.18",
+    "nodemon": "^2.0.20",
+    "prettier": "^2.7.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.24",
+    "ts-node": "^10.9.1"
+  }
+}
