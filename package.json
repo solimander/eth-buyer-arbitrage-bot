@@ -4,8 +4,7 @@
   "description": "An example ETH buyer arbitrage bot",
   "main": "index.ts",
   "directories": {
-    "lib": "lib",
-    "test": "test"
+    "lib": "lib"
   },
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\" \"contracts/**/*.sol\"",

@@ -45,7 +45,6 @@ export const TOKENS = tokens[CHAIN_ID] || (() => { throw new Error(`No tokens fo
 // prettier-ignore
 export const CONTRACT_ADDRESSES = addresses[CHAIN_ID] || (() => { throw new Error(`No contract addresses for chain ID: ${CHAIN_ID}`) })();
 
-export const OPPORTUNITY_CHECK_INTERVAL_MS = OPPORTUNITY_CHECK_INTERVAL_SEC * 1000;
 export const UNISWAP_V3_SWAP_ROUTER_ADDRESS = '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45';
 export const FLASHBOTS_RELAY = 'https://relay.flashbots.net';
 

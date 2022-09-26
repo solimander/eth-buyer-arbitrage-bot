@@ -8,23 +8,20 @@ import {
   usdc,
   eth,
   swapConfig,
-  UNISWAP_V3_SWAP_ROUTER_ADDRESS,
-  OPPORTUNITY_CHECK_INTERVAL_MS,
   flashbots,
   signer,
   OPTIMAL_PRICE_ROUNDING_MARGIN,
   OPPORTUNITY_CHECK_INTERVAL_SEC,
+  UNISWAP_V3_SWAP_ROUTER_ADDRESS,
 } from './config';
 import { CurrencyAmount, TradeType } from '@uniswap/sdk-core';
 import { TransactionRequest } from '@ethersproject/abstract-provider';
-import { BigNumber as EthersBN, utils, Wallet } from 'ethers';
-import { binarySearch, getPopulatedRoute } from './utils';
+import { BigNumber as EthersBN, utils } from 'ethers';
+import { binarySearch, delay, getPopulatedRoute } from './utils';
 import { Trade } from '@uniswap/router-sdk';
 import { tryF, isError } from 'ts-try';
 
 const { ArbitrageBot } = CONTRACT_ADDRESSES;
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const run = async () => {
   const tokenBuyerState = await tryF<[EthersBN, EthersBN]>(async () =>
@@ -41,7 +38,7 @@ const run = async () => {
     logger.info(
       `Token buyer contract has no ETH balance. Checking again in ${OPPORTUNITY_CHECK_INTERVAL_SEC} seconds.`,
     );
-    await delay(OPPORTUNITY_CHECK_INTERVAL_MS);
+    await delay(OPPORTUNITY_CHECK_INTERVAL_SEC);
     run();
     return;
   }
@@ -49,7 +46,7 @@ const run = async () => {
     logger.info(
       `Token buyer contract does not need any USDC. Checking again in ${OPPORTUNITY_CHECK_INTERVAL_SEC} seconds.`,
     );
-    await delay(OPPORTUNITY_CHECK_INTERVAL_MS);
+    await delay(OPPORTUNITY_CHECK_INTERVAL_SEC);
     run();
     return;
   }
@@ -170,7 +167,7 @@ const run = async () => {
     logger.warn(
       `Arbitrage failed with error: ${result.message}. Retrying in ${OPPORTUNITY_CHECK_INTERVAL_SEC} seconds.`,
     );
-    await delay(OPPORTUNITY_CHECK_INTERVAL_MS);
+    await delay(OPPORTUNITY_CHECK_INTERVAL_SEC);
   }
   run();
 };
