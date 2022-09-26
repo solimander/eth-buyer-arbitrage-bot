@@ -83,7 +83,7 @@ const run = async (shouldDelay = false) => {
   };
 
   // Determine the most profitable output amount
-  let optimalUSDCOut = await binarySearch(BN_0, usdcNeeded, BN_0, calcProfit);
+  let optimalUSDCOut = await binarySearch(BN_0, usdcNeeded, calcProfit);
   if (usdcNeeded.sub(optimalUSDCOut).lt(OPTIMAL_PRICE_ROUNDING_MARGIN)) {
     optimalUSDCOut = usdcNeeded; // Arb the full amount needed if the estimate is close enough
   }
