@@ -55,7 +55,7 @@ export const BN_36 = EthersBN.from(10).pow(36);
 const { USDC } = TOKENS;
 const { TokenBuyer, Payer } = CONTRACT_ADDRESSES;
 
-export const OPTIMAL_PRICE_ROUNDING_MARGIN = EthersBN.from(10).pow(USDC.decimals).mul(5_000);
+export const OPTIMAL_PRICE_ROUNDING_MARGIN = EthersBN.from(10).pow(USDC.decimals).mul(1_000);
 
 export const logger = new Logger({ displayFilePath: 'hidden' });
 export const provider = new providers.JsonRpcProvider(JSON_RPC_URL);

@@ -87,6 +87,11 @@ const run = async (shouldDelay = false) => {
   if (usdcNeeded.sub(optimalUSDCOut).lt(OPTIMAL_PRICE_ROUNDING_MARGIN)) {
     optimalUSDCOut = usdcNeeded; // Arb the full amount needed if the estimate is close enough
   }
+  if (optimalUSDCOut.eq(0)) {
+    logger.info(`Arbitrage is not profitable. Retrying in ${intervalSeconds} seconds.`);
+    return run(true);
+  }
+
   logger.info(`Optimal USDC output amount: ${utils.formatUnits(optimalUSDCOut, usdc.decimals)}`);
 
   // Fetch a fresh route with the optimal USDC output
