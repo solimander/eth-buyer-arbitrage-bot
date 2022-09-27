@@ -90,5 +90,5 @@ export const poolTicksQuery = gql`
 export const swapConfig = {
   recipient: Payer.address, // Send funds directly to the payer
   slippageTolerance: new Percent(1, 100), // 1%
-  deadline: Math.floor(Date.now() / 1000 + 1800), // 3 minutes
+  deadline: Math.floor(Date.now() / 1000 + 1800), // 30 minutes
 };
