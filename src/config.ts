@@ -23,13 +23,13 @@ const tokens: Record<number, Record<TokenSymbol, TokenInfo>> = {
 const addresses: Record<number, Record<ContractName, { address: string }>> = {
   [SupportedChainId.MAINNET]: {
     TokenBuyer: {
-      address: '0xc32609c91d6b6b51d48f2611308fef121b02041f',
+      address: '0x12d5d5370C3a7F90D1008413736B017032878803',
     },
     Payer: {
-      address: '0x8e45c0936fa1a65bdad3222befec6a03c83372ce',
+      address: '0x94A63a8391b8d7d188d48994c4564f0946EbA000',
     },
     ArbitrageBot: {
-      address: '0x262e2b50219620226c5fb5956432a88fffd94ba7',
+      address: '0x62b66314509c053EC1c8c0919664Bdf09325e055',
     },
   },
 };

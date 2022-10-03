@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-
-pragma solidity ^0.8.15;
+pragma solidity 0.8.16;
 
 interface IBuyETHCallback {
     /// @notice Called on the {to} in TokenBuyer#buyETH, with `msg.value` ETH payment in exchange for {amount} TokenBuyer#paymentToken.
