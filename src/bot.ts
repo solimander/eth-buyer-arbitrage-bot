@@ -27,7 +27,7 @@ const { ArbitrageBot } = CONTRACT_ADDRESSES;
  * Run the arbitrage bot. This is a recursive function which delays itself if necessary.
  * @param shouldDelay Whether execution should be delayed `intervalSeconds` seconds.
  */
-const run = async (shouldDelay = false) => {
+const run = async (shouldDelay = false): Promise<void> => {
   if (shouldDelay) {
     await delay(intervalSeconds);
   }
