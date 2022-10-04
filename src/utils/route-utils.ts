@@ -11,7 +11,7 @@ import { TickInfo } from '../types';
  */
 export const getPopulatedRoute = async (route: V2Route | V3Route | MixedRoute) => {
   const _route = route as MixedRoute;
-  for (let i = 0; i < _route.pools.length; i++) {
+  for (let i = 0; i < _route.pools?.length; i++) {
     let pool = _route.pools[i];
     if (!(pool instanceof Pool)) {
       continue;

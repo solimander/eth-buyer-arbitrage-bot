@@ -2,7 +2,7 @@ import { Percent, SupportedChainId, Token } from '@uniswap/sdk-core';
 import { providers, BigNumber as EthersBN, Wallet, Contract } from 'ethers';
 import { ContractName, TokenInfo, TokenSymbol } from './types';
 import { AlphaRouter, nativeOnChain } from '@uniswap/smart-order-router';
-import { FlashbotsTransactionClient, GraphQLPaginationClient } from './utils';
+import { FlashbotsTransactionClient, GasPriceProvider, GraphQLPaginationClient } from './utils';
 import { FlashbotsBundleProvider } from '@flashbots/ethers-provider-bundle';
 import { gql } from 'graphql-request';
 import { TokenBuyerABI } from './abi';
@@ -73,7 +73,11 @@ export const flashbotsProvider = new FlashbotsBundleProvider(
   CHAIN_ID,
 );
 export const flashbots = new FlashbotsTransactionClient(provider, flashbotsProvider, logger);
-export const router = new AlphaRouter({ chainId: CHAIN_ID, provider });
+export const router = new AlphaRouter({
+  chainId: CHAIN_ID,
+  provider,
+  gasPriceProvider: new GasPriceProvider(),
+});
 export const uniswapClient = new GraphQLPaginationClient(
   'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
 );
